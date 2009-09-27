@@ -18,6 +18,7 @@
 # - アーカイブの作成
 # - アーカイブのアップロード
 # - svn のタグ付け
+# - pypi の更新
 #
 if [ $# -lt 1 ]; then
   echo "$0 <VERSION>"
@@ -68,3 +69,7 @@ if [ $? -eq 0 ]; then
   exit 1
 fi
 svn copy ${TrunkUrl} ${TagUrl} -m "[release.sh] add release tag ${Version}" 
+
+# (4) pypi の更新
+python setup.py register
+
