@@ -27,7 +27,7 @@ setup(
       author = "Takashi Someda",
       author_email = "someda@isenshi.com",
       url = "http://code.google.com/p/backloglib/",
-      download_url = "http://code.google.com/p/backloglib/downloads/list",
+      download_url = "http://backloglib.googlecode.com/files/backloglib-0.1.1.tar.gz",
       description = "Backlog client library",
       long_description ="",
       platforms = "any",      
