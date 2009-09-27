@@ -23,7 +23,7 @@ XML-RPC で提供されている API に対してアクセスを行い、オブ�
 返す機能を提供します。
 """
 
-__version__ = "0.1"
+__version__ = "0.1.1"
 __author__ = "someda@isenshi.com"
 
 #

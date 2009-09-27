@@ -23,7 +23,7 @@ if not (2, 4) < sys.version_info[:2] :
 
 setup(
       name = "backloglib",
-      version = "0.1",
+      version = "0.1.1",
       author = "Takashi Someda",
       author_email = "someda@isenshi.com",
       url = "http://code.google.com/p/backloglib/",
