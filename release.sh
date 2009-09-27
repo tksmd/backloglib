@@ -15,9 +15,9 @@
 # governing permissions and limitations under the License.
 #
 # リリース作業用のシェル
+# - アーカイブの作成
+# - アーカイブのアップロード
 # - svn のタグ付け
-# - download 用アーカイブの作成
-# - download 用アーカイブのアップロード
 #
 if [ $# -lt 1 ]; then
   echo "$0 <VERSION>"
@@ -26,8 +26,8 @@ fi
 Version=$1
 
 RepoBase="https://backloglib.googlecode.com/svn/"
-TagBase="https://backloglib.googlecode.com/svn/tags/backloglib"
-TrunkUrl="https://backloglib.googlecode.com/svn/trunk/backloglib"
+TagBase="${RepoBase}/tags/backloglib"
+TrunkUrl="${RepoBase}/trunk/backloglib"
 
 if [ $(svn status . | wc -l) -gt 0 ]; then
   echo -n "modified items exist, continue ? [y|n] "
@@ -48,7 +48,19 @@ if [ $(svn status . | wc -l) -gt 0 ]; then
   done
 fi
 
-# (1) タグ付け
+
+# (1) アーカイブ作成
+python setup.py sdist --force-manifest
+
+# (2) アップロード
+ArchiveFile="dist/backloglib-${Version}.tar.gz"
+if [ ! -f ${ArchiveFile} ]; then
+  echo "${ArchiveFile} not found, please check version in your setup.py"
+  exit 1
+fi
+python googlecode_upload.py -s "backloglib release ${Version}" -p backloglib ${ArchiveFile}
+
+# (3) タグ付け
 TagUrl="${TagBase}/REL-${Version}"
 svn ls ${TagUrl} > /dev/null 2>&1
 if [ $? -eq 0 ]; then
@@ -56,10 +68,3 @@ if [ $? -eq 0 ]; then
   exit 1
 fi
 svn copy ${TrunkUrl} ${TagUrl} -m "[release.sh] add release tag ${Version}" 
-
-# (2) アーカイブ作成
-python setup.py sdist --force-manifest
-
-# (3) アップロード
-ArchiveFile="dist/backloglib-${Version}.tar.gz"
-python googlecode_upload.py -s "backloglib release ${Version}" -p backloglib ${ArchiveFile}
