@@ -15,7 +15,16 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
+"""
+Backlog (http://www.backlog.jp/) client libarary
+
+Backlog のクライアントライブラリです。
+XML-RPC で提供されている API に対してアクセスを行い、オブジェクトにラッピングして
+返す機能を提供します。
+"""
+
 __version__ = "0.1"
+__author__ = "someda@isenshi.com"
 
 #
 # Backlog (http://www.backlog.jp) CLIENT LIBRARY
@@ -66,33 +75,50 @@ class Backlog(object):
     def count_issue(self,condition):
         if not isinstance(condition, FindCondition) :
             condition = FindCondition(condition)
-        return self.server.backlog.countIssue(condition)
+        return self.server.backlog.countIssue(condition.serialize())
     
     def find_issue(self,condition):
         if not isinstance(condition, FindCondition) :
             condition = FindCondition(condition)
-        issues = self.server.backlog.findIssue(condition)
+        issues = self.server.backlog.findIssue(condition.serialize())
         return [Issue(**x) for x in issues]
     
     def create_issue(self,issue):
         if not isinstance(issue, Issue) :
             issue = Issue(**issue)
-        ret = self.server.backlog.createIssue(issue)
+        ret = self.server.backlog.createIssue(issue.serialize())
         return Issue(**ret)
     
     def update_issue(self,issue):
         if not isinstance(issue, Issue) :
             issue = Issue(**issue)
-        ret = self.server.backlog.updateIssue(issue)
+        ret = self.server.backlog.updateIssue(issue.serialize())
         return Issue(**ret)
     
     def switch_status(self,status):
         if not isinstance(status,UpdateStatus) :
             status = UpdateStatus(**status)
-        ret = self.server.backlog.switchStatus(status)
+        ret = self.server.backlog.switchStatus(status.serialize())
         return Issue(**ret)
 
-class BacklogObject(object):
+class Serializable(object):
+    """
+    XML-RPC 用に marshall するためのメソッドを持つクラス
+    """    
+    def serialize(self):
+        return self._do_convert(vars(self))
+        
+    def _do_convert(self,obj):
+        if isinstance(obj, types.DictType) :
+            return dict([(k, self._do_convert(v)) for k,v in obj.iteritems()])
+        elif isinstance(obj, types.ListType) or isinstance(obj, types.TupleType) : 
+            return [self._do_convert(v) for v in obj]
+        elif hasattr(obj, "__dict__"):
+            return self._do_convert(vars(obj))
+        else :
+            return obj
+
+class BacklogObject(Serializable):
     
     _REPR_FORMAT_ = "[%(id)s] %(name)s"
     
@@ -101,7 +127,7 @@ class BacklogObject(object):
         self.name = name
     
     def __repr__(self):        
-        return self.__class__._REPR_FORMAT_ % self.__dict__
+        return self.__class__._REPR_FORMAT_ % vars(self)
     
     __str__ = __repr__
 
@@ -167,8 +193,8 @@ class Issue(BacklogObject):
             val = v
             if Issue._CONVERTERS_.has_key(k) :
                 converter =Issue._CONVERTERS_[k]
-                if type(v) == types.ListType :
-                    val = map(lambda x : converter(**x), v)
+                if isinstance(v,types.ListType) or isinstance(v,types.TupleType) :
+                    val = [converter(**x) for x in v]
                 else :
                     val = converter(**v)
             self.__dict__[k] = val
@@ -195,7 +221,7 @@ class UpdateStatus(BacklogObject):
         self.resolutionId = resolutionId
         self.comment = comment
 
-class FindCondition():
+class FindCondition(Serializable):
     
     COND_KEYS = [
                  "projectId",
@@ -230,6 +256,6 @@ class FindCondition():
                 self.__dict__[k] = v
                 
     def __repr__(self):
-        return ":".join([k+"="+repr(v) for k,v in self.__dict__.iteritems()])
+        return ":".join([k+"="+repr(v) for k,v in vars(self).iteritems()])
     
     __str__ = __repr__
