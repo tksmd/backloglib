@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2009 Takashi SOMEDA
+# Copyright 2009 - 2010 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,10 @@ class Backlog(object):
         
     def __init__(self, space, username, password):
         uri = _URI_FORMAT_ % {"username":username, "password":password, "space":space}
-        self.server = ServerProxy(uri)    
+        self.server = ServerProxy(uri)
+        
+    def _wrap_id(self,id):
+        return {"id":id}
     
     def get_projects(self):
         projects = self.server.backlog.getProjects()
@@ -122,11 +125,14 @@ class Backlog(object):
         ret = self.server.backlog.updateIssueType(issueType.serialize())
         return IssueType(**ret)
     
-    def delete_issue_type(self, id, substitute_id):
+    def delete_issue_type(self, id, substitute_id=None):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
-        """        
-        ret = self.server.backlog.deleteIssueType(id, substitute_id)
+        """
+        args = self._wrap_id(id)
+        if substitute_id :
+            args["substitute_id"] = substitute_id
+        ret = self.server.backlog.deleteIssueType(args)
         return IssueType(**ret)
     
     def add_version(self, version):
@@ -135,7 +141,7 @@ class Backlog(object):
         """
         if not isinstance(version,AddVersion) :
             version = AddVersion(**version)
-        ret = self.server.backlog.addVersion(version)
+        ret = self.server.backlog.addVersion(version.serialize())
         return UpdateVersion(**ret)
     
     def update_version(self, version):
@@ -144,7 +150,7 @@ class Backlog(object):
         """
         if not isinstance(version, UpdateVersion) :
             version = UpdateVersion(**version)
-        ret = self.server.backlog.updateVersion(version)
+        ret = self.server.backlog.updateVersion(version.serialize())
         return UpdateVersion(**ret)
     
     def delete_version(self, id):
@@ -154,11 +160,13 @@ class Backlog(object):
         ret = self.server.backlog.deleteVersion(id)
         return UpdateVersion(**ret)
     
-    def add_component(self, project_id, name):
+    def add_component(self, component):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """        
-        ret = self.server.backlog.addComponent(project_id, name)
+        if not isinstance(component, AddComponent) :
+            component = AddComponent(**component)        
+        ret = self.server.backlog.addComponent(component.serialize())
         return Component(**ret)
     
     def update_component(self, component):
@@ -287,14 +295,14 @@ class Serializable(object):
         
     def _do_convert(self, obj):
         if isinstance(obj, types.DictType) :
-            return dict([(k, self._do_convert(v)) for k, v in obj.iteritems()])
+            return dict([(k, self._do_convert(v)) for k, v in obj.iteritems() if v])
         elif isinstance(obj, types.ListType) or isinstance(obj, types.TupleType) : 
             return [self._do_convert(v) for v in obj]
         elif hasattr(obj, "__dict__"):
             return self._do_convert(vars(obj))
         else :
             return obj
-
+        
 class BacklogObject(Serializable):
     
     _REPR_FORMAT_ = "[%(id)s] %(name)s"
@@ -305,10 +313,19 @@ class BacklogObject(Serializable):
     
     def __repr__(self):        
         return self.__class__._REPR_FORMAT_ % vars(self)
-    
+        
     __str__ = __repr__
 
 Component = type("Component", (BacklogObject,), {})
+
+class AddComponent(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(project_id)s] %(name)s"    
+    
+    def __init__(self, project_id, name):
+        self.project_id = project_id
+        self.name = name
+
 User = type("User", (BacklogObject,), {})
 Priority = type("Priority", (BacklogObject,), {"HIGH":2, "MIDDLE":3, "LOW":4})
 Resolution = type("Resolution", (BacklogObject,), {"UNSET":-1, "DONE":0, "IGNORE":1, "INVALID":2, "DUPLICATE":3, "WORKWELL":4})
