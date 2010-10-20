@@ -32,20 +32,20 @@ __author__ = "someda@isenshi.com"
 from xmlrpclib import ServerProxy
 import types
 
+from model import *
+
 _URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.backlog.jp/XML-RPC"
 
-class Backlog(object):
-    """
-    @since: 0.1.1 (Backlog R2009-01-30)
-    """
-        
+class BacklogBase(object):
+    
     def __init__(self, space, username, password):
         uri = _URI_FORMAT_ % {"username":username, "password":password, "space":space}
         self.server = ServerProxy(uri)
-        
-    def _wrap_id(self,id):
-        return {"id":id}
-    
+
+class Backlog(BacklogBase):
+    """
+    @since: 0.1.1 (Backlog R2009-01-30)
+    """            
     def get_projects(self):
         projects = self.server.backlog.getProjects()
         return [Project(**x) for x in projects]
@@ -129,7 +129,7 @@ class Backlog(object):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """
-        args = self._wrap_id(id)
+        args = {"id":id}
         if substitute_id :
             args["substitute_id"] = substitute_id
         ret = self.server.backlog.deleteIssueType(args)
@@ -242,245 +242,87 @@ class Backlog(object):
         priorities = self.server.backlog.getPriorities()
         return [Priority(**x) for x in priorities]        
 
-class BacklogAdmin(object):
+class BacklogAdmin(BacklogBase):
     """
     @since: 0.2.1 (Backlog R2010-03-31)
-    """
-    def __init__(self, space, username, password):
-        uri = _URI_FORMAT_ % {"username":username, "password":password, "space":space}
-        self.server = ServerProxy(uri)    
-        
+    """    
+    ROLE_ADMIN = "admin"
+    ROLE_NORMAL_USER = "normal-user"
+    ROLE_REPORTER = "reporter"
+    ROLE_VIEWER = "viewer"
+    ROLE_GUEST_REPORTER = "guest-reporter"
+    ROLE_GUEST_VIEWER = "guest-viewer"
+    
     def get_users(self):
-        pass
+        users = self.server.backlog.admin.getUsers()
+        return [AdminUser(**x) for x in users]
         
     def add_user(self, user):
-        pass
+        if not isinstance(user, AdminAddUser) :
+            user = AdminAddUser(**user)
+        ret = self.server.backlog.admin.addUser(user.serialize())
+        return AdminUser(**ret)
     
     def update_user(self, user):
-        pass
+        if isinstance(user, AdminUser) :
+            user = vars(user)
+            del user["created_on"]
+            del user["updated_on"]
+            del user["user_id"]
+            user = AdminUpdateUser(**user)
+        elif not isinstance(user, AdminUpdateUser) :
+            user = AdminUpdateUser(**user)
+        ret = self.server.backlog.admin.updateUser(user.serialize())
+        return AdminUser(**ret)
     
     def delete_user(self, id):
-        pass
+        user = self.server.backlog.admin.deleteUser(id)
+        return AdminUser(**user)
     
     def get_projects(self):
-        pass
+        projects = self.server.backlog.admin.getProjects()
+        return [AdminProject(**x) for x in projects]
     
     def add_project(self, project):
-        pass
+        if not isinstance(project,AdminAddProject) :
+            project = AdminAddProject(**project)
+        ret = self.server.backlog.admin.addProject(project.serialize())
+        return AdminProject(**ret)
     
     def update_project(self, project):
-        pass
+        if isinstance(project, AdminProject) :
+            project = vars(project)
+            del project["created_on"]
+            del project["updated_on"]
+            del project["url"]
+            project = AdminAddProject(**project)        
+        elif not isinstance(project,AdminUpdateProject) :
+            project = AdminUpdateProject(**project)
+        ret = self.server.backlog.admin.updateProject(project.serialize())
+        return AdminProject(**ret)
     
     def delete_project(self, id):
-        pass
+        ret = self.server.backlog.admin.deleteProject(id)
+        return AdminProject(**ret)
     
     def get_project_users(self, project_id):
-        pass
+        ret = self.server.backlog.admin.getProjectUsers(project_id)
+        return [AdminProjectUser(**x) for x in ret]
     
-    def add_project_user(self):
-        pass
+    def add_project_user(self,project_user):
+        if not isinstance(project_user, AdminAddProjectUser) :
+            project_user = AdminAddProjectUser(**project_user)
+        ret = self.server.backlog.admin.addProjectUser(project_user.serialize())
+        return AdminProjectUser(**ret)
     
-    def update_project_user(self):
-        pass
+    def update_project_users(self, project_users):
+        if not isinstance(project_users,AdminUpdateProjectUsers) :
+            project_users = AdminUpdateProjectUsers(**project_users)
+        ret = self.server.backlog.admin.updateProjectUsers(project_users.serialize())
+        return [AdminProjectUser(**x) for x in ret]
     
-    def delete_project_user(self):
-        pass            
-
-class Serializable(object):
-    """
-    XML-RPC 用に marshall するためのメソッドを持つクラス
-    """    
-    def serialize(self):
-        return self._do_convert(vars(self))
-        
-    def _do_convert(self, obj):
-        if isinstance(obj, types.DictType) :
-            return dict([(k, self._do_convert(v)) for k, v in obj.iteritems() if v])
-        elif isinstance(obj, types.ListType) or isinstance(obj, types.TupleType) : 
-            return [self._do_convert(v) for v in obj]
-        elif hasattr(obj, "__dict__"):
-            return self._do_convert(vars(obj))
-        else :
-            return obj
-        
-class BacklogObject(Serializable):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(name)s"
-    
-    def __init__(self, id, name):
-        self.id = id
-        self.name = name
-    
-    def __repr__(self):        
-        return self.__class__._REPR_FORMAT_ % vars(self)
-        
-    __str__ = __repr__
-
-Component = type("Component", (BacklogObject,), {})
-
-class AddComponent(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(project_id)s] %(name)s"    
-    
-    def __init__(self, project_id, name):
-        self.project_id = project_id
-        self.name = name
-
-User = type("User", (BacklogObject,), {})
-Priority = type("Priority", (BacklogObject,), {"HIGH":2, "MIDDLE":3, "LOW":4})
-Resolution = type("Resolution", (BacklogObject,), {"UNSET":-1, "DONE":0, "IGNORE":1, "INVALID":2, "DUPLICATE":3, "WORKWELL":4})
-Status = type("Status", (BacklogObject,), {"UNDONE":1, "PROGRESS":2, "COMPLETED":3, "DONE":4})
-
-class Project(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s][%(key)s] %(url)s"
-    
-    def __init__(self, id, key, name, url, archived):
-        self.id = id
-        self.key = key
-        self.name = name
-        self.url = url
-        self.archived = archived
-                    
-class Version(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(name)s %(date)s"    
-    
-    def __init__(self, id, name, date):
-        self.id = id
-        self.name = name
-        self.date = date
-        
-Milestone = type("Milestone", (Version,), {})
-
-class AddVersion(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(project_id)s] %(name)s %(start_date)s %(due_date)s"    
-    
-    def __init__(self, project_id, name, start_date=None, due_date=None):
-        self.project_id = project_id
-        self.name = name
-        self.start_date = start_date
-        self.due_date = due_date
-
-class UpdateVersion(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(name)s %(start_date)s %(due_date)s %(archived)s"    
-    
-    def __init__(self, id, name, start_date=None, due_date=None, archived=False):
-        self.id = id
-        self.name = name
-        self.start_date = start_date
-        self.due_date = due_date
-        self.archived = archived
-
-class IssueType(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(name)s %(color)s"    
-    
-    def __init__(self, id, name, color=None):
-        """
-        color は get_issue_types と get_issue/find_issue で
-        前者の場合は設定され、後者の場合は設定されない。    
-        """
-        self.id = id
-        self.name = name
-        self.color = color
-
-class AddIssueType(BacklogObject):
-
-    _REPR_FORMAT_ = "[%(project_id)s] %(name)s %(color)s"    
-    
-    def __init__(self, project_id, name, color):
-        self.project_id = project_id
-        self.name = name
-        self.color = color    
-                        
-class Issue(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s][%(key)s] %(summary)s"
-    
-    _CONVERTERS_ = {"assigner":User,
-                    "created_user":User,
-                    "priority":Priority,
-                    "version":Version,
-                    "versions":Version,
-                    "milestone":Milestone,
-                    "milestones":Milestone,
-                    "component":Component,
-                    "components":Component,
-                    "issueType":IssueType,
-                    "status":Status,
-                    "resolution":Resolution}
-    
-    def __init__(self, **kwargs):
-        for k, v in kwargs.iteritems():            
-            val = v
-            if Issue._CONVERTERS_.has_key(k) :
-                converter = Issue._CONVERTERS_[k]
-                if isinstance(v, types.ListType) or isinstance(v, types.TupleType) :
-                    val = [converter(**x) for x in v]
-                else :
-                    val = converter(**v)
-            self.__dict__[k] = val
-
-class Comment(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(content)s"
-    
-    def __init__(self, id, content, created_user, created_on, updated_on):
-        self.id = id
-        self.content = content
-        self.created_user = User(**created_user)
-        self.created_on = created_on
-        self.udpated_on = updated_on
-        
-class UpdateStatus(BacklogObject):
-    
-    _REPR_FORMAT_ = "[%(key)s] %(statusId)s"
-    
-    def __init__(self, key, statusId, assignerId, resolutionId, comment):
-        self.key = key
-        self.statusId = statusId
-        self.assignerId = assignerId
-        self.resolutionId = resolutionId
-        self.comment = comment
-
-class FindCondition(Serializable):
-    
-    COND_KEYS = [
-                 "projectId",
-                 "issueTypeId",
-                 "issueType",
-                 "componentId",
-                 "versionId",
-                 "milestoneId",
-                 "statusId",
-                 "priorityId",
-                 "assignerId",
-                 "createdUserId",
-                 "resolutionId",
-                 "created_on_min",
-                 "created_on_max",
-                 "updated_on_min",
-                 "updated_on_max",
-                 "start_date_min",
-                 "start_date_max",
-                 "due_date_min",
-                 "due_date_max",
-                 "query",
-                 "sort",
-                 "order",
-                 "offset",
-                 "limit"
-                 ]
-    
-    def __init__(self, params):
-        for k, v in params.iteritems():
-            if k in self.COND_KEYS :
-                self.__dict__[k] = v
-                
-    def __repr__(self):
-        return ":".join([k + "=" + repr(v) for k, v in vars(self).iteritems()])
-    
-    __str__ = __repr__
+    def delete_project_user(self,project_user):
+        if not isinstance(project_user, AdminAddProjectUser) :
+            project_user = AdminAddProjectUser(**project_user)
+        ret = self.server.backlog.admin.deleteProjectUser(project_user.serialize())
+        return AdminProjectUser(**ret)
