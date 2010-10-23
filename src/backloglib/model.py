@@ -50,6 +50,12 @@ class BacklogObject(Serializable):
     
     def __repr__(self):        
         return self.__class__._REPR_FORMAT_ % vars(self)
+    
+    def _wrap(self, obj, clazz):
+        ret = obj
+        if not isinstance(obj, clazz) :
+            ret = clazz(**obj)
+        return ret
         
     __str__ = __repr__
 
@@ -221,7 +227,53 @@ class FindCondition(Serializable):
         return ":".join([k + "=" + repr(v) for k, v in vars(self).iteritems()])
     
     __str__ = __repr__
+
+ActivityType = type("ActivityType", (BacklogObject,), {"CREATE_ISSUE":1, "UPDATE_ISSUE":2, "CREATE_COMMENT":3})
+
+class DetailUser(User):
+    
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(lang)s"
         
+    def __init__(self,id,name,lang,updated_on):
+        super(DetailUser,self).__init__(id,name)
+        self.lang = lang
+        self.updated_on = updated_on
+
+class UserIcon(BacklogObject):
+      
+    _REPR_FORMAT_ = "[%(id)s] %(content_type)s"
+            
+    def __init__(self,id,content_type,data,updated_on):
+        self.id = id
+        self.content_type = content_type
+        self.data = data
+        self.updated_on = updated_on
+
+class TimelineIssue(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(id)s][%(key)s] %(summary)s"
+        
+    def __init__(self,id,key,summary,description,priority):
+        self.id = id
+        self.key = key
+        self.summary = summary
+        self.description = description
+        self.priority = self._wrap(priority,Priority)
+
+class Timeline(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(updated_on)s] %(content)s"    
+    
+    def __init__(self,type,content,updated_on,user,issue):
+        self.type = self._wrap(type, ActivityType)
+        self.content = content
+        self.updated_on = updated_on
+        self.issue = self._wrap(issue, TimelineIssue)
+
+###
+### 以下 BacklogAdmin 用のモデルオブジェクト
+###
+     
 class AdminUser(BacklogObject):
     
     _REPR_FORMAT_ = "[%(id)s] %(user_id)s %(mail_address)s %(role)s"    

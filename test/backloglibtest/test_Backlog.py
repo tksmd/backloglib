@@ -20,6 +20,10 @@ import backloglibtest
 import unittest
 import backloglib
 
+import xmlrpclib
+import tempfile
+import os
+
 from test import test_support
 
 _AVAILABLE_PROJECT_ID_ = 12016
@@ -112,6 +116,71 @@ class BacklogTest(backloglibtest.BacklogTestCase):
         actual = self.backlog.update_component(actual)                         
         self.assertEquals(u"mod",actual.name)
         self.backlog.delete_component(actual.id)
+        
+    def test_get_timeline1(self):
+        """
+        @since: 0.2.1
+        """        
+        actual = self.backlog.get_timeline()
+        self.assertTrue(len(actual) > 0)
+#        print actual        
+        
+    def test_get_activity_types1(self):
+        """
+        @since: 0.2.1
+        """
+        actual = self.backlog.get_activity_types()
+        self.assertEquals(3,len(actual))
+        
+    def test_get_user1(self):
+        """
+        @since: 0.2.1
+        """        
+        actual = self.backlog.get_user("tksmd")
+        self.assertEquals(28959,actual.id)
+        actual = self.backlog.get_user(28959)
+        self.assertEquals("tksmd",actual.name)
+        self.assertEquals("ja",actual.lang)
+        
+    def test_get_user_icon1(self):
+        """
+        @since: 0.2.1
+        """        
+        actual = self.backlog.get_user_icon(28959)
+        self.assertEquals("image/gif",actual.content_type)        
+        self.assertTrue(isinstance(actual.data,xmlrpclib.Binary))        
+        
+        [fd,tmppath] = tempfile.mkstemp()        
+        print tmppath
+        buf = actual.data.data
+        s = len(buf)
+                
+        f = open(tmppath, "wb")
+        for i in range(s) :
+            f.write(buf[i])
+        f.close()
+        os.remove(tmppath)
+        
+    def test_get_statuses1(self):
+        """
+        @since: 0.2.1
+        """
+        actual = self.backlog.get_statuses()
+        self.assertEquals(4,len(actual))
+        
+    def test_get_priorities1(self):
+        """
+        @since: 0.2.1
+        """
+        actual = self.backlog.get_priorities()
+        self.assertEquals(3,len(actual))
+        
+    def test_get_resolutions1(self):
+        """
+        @since: 0.2.1
+        """
+        actual = self.backlog.get_resolutions()
+        self.assertEquals(5,len(actual))
 
 class FindConditionTest(unittest.TestCase):
     

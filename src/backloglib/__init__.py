@@ -189,9 +189,17 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
-        pass
+        ret = self.server.backlog.getTimeline()
+        return [Timeline(**x) for x in ret]
     
     def get_activity_types(self):
+        """
+        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        """        
+        ret = self.server.backlog.getActivityTypes();
+        return [ActivityType(**x) for x in ret]
+    
+    def add_comment(self):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
@@ -213,13 +221,15 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
-        pass
+        ret = self.server.backlog.getUser(user_id)
+        return DetailUser(**ret)
     
     def get_user_icon(self,user_id):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
-        pass
+        ret = self.server.backlog.getUserIcon(user_id)
+        return UserIcon(**ret)
     
     def get_statuses(self):
         """
