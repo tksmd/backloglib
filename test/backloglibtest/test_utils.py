@@ -18,7 +18,7 @@
 from test import test_support
 
 from backloglib import utils
-from backloglib.model import Status
+from backloglib.models import Status
 
 import unittest
 

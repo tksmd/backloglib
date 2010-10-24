@@ -32,8 +32,8 @@ __author__ = "someda@isenshi.com"
 from xmlrpclib import ServerProxy
 import types
 
-from model import *
 from utils import classwrap
+from models import *
 
 _URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.backlog.jp/XML-RPC"
 
