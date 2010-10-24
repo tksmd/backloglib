@@ -258,12 +258,13 @@ class TimelineIssue(BacklogObject):
 
 class Timeline(BacklogObject):
     
-    _REPR_FORMAT_ = "[%(updated_on)s] %(content)s"    
+    _REPR_FORMAT_ = "[%(updated_on)s] %(content)s %(user)s"    
     
     def __init__(self,type,content,updated_on,user,issue):
         self.type = classwrap(type, ActivityType)
         self.content = content
         self.updated_on = updated_on
+        self.user = classwrap(user,User)
         self.issue = classwrap(issue, TimelineIssue)
 
 class StatusSummary(Status):
