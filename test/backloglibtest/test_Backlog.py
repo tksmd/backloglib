@@ -124,13 +124,20 @@ class BacklogTest(backloglibtest.BacklogTestCase):
         actual = self.backlog.get_timeline()
         self.assertTrue(len(actual) > 0)
 #        print actual        
-        
-    def test_get_activity_types1(self):
+
+    def test_get_project_summary1(self):
         """
         @since: 0.2.1
+        """        
+        actual = self.backlog.get_project_summary(12016)
+        self.assertTrue(actual)
+
+    def test_get_project_summaries1(self):
         """
-        actual = self.backlog.get_activity_types()
-        self.assertEquals(3,len(actual))
+        @since: 0.2.1
+        """        
+        actual = self.backlog.get_project_summaries()
+        self.assertEquals(1,len(actual))
         
     def test_get_user1(self):
         """
@@ -160,6 +167,14 @@ class BacklogTest(backloglibtest.BacklogTestCase):
             f.write(buf[i])
         f.close()
         os.remove(tmppath)
+        
+    def test_get_activity_types1(self):
+        """
+        @since: 0.2.1
+        """
+        actual = self.backlog.get_activity_types()
+        self.assertEquals(3,len(actual))
+        
         
     def test_get_statuses1(self):
         """

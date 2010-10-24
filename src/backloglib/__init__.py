@@ -33,6 +33,7 @@ from xmlrpclib import ServerProxy
 import types
 
 from model import *
+from utils import classwrap
 
 _URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.backlog.jp/XML-RPC"
 
@@ -78,7 +79,7 @@ class Backlog(BacklogBase):
         comments = self.server.backlog.getComments(issue_id)
         return [Comment(**x) for x in comments]
     
-    def count_issue(self, condition):
+    def count_issue(self, condition):        
         if not isinstance(condition, FindCondition) :
             condition = FindCondition(condition)
         return self.server.backlog.countIssue(condition.serialize())
@@ -90,20 +91,17 @@ class Backlog(BacklogBase):
         return [Issue(**x) for x in issues]
     
     def create_issue(self, issue):
-        if not isinstance(issue, Issue) :
-            issue = Issue(**issue)
+        issue = classwrap(issue,Issue)
         ret = self.server.backlog.createIssue(issue.serialize())
         return Issue(**ret)
     
     def update_issue(self, issue):
-        if not isinstance(issue, Issue) :
-            issue = Issue(**issue)
+        issue = classwrap(issue)            
         ret = self.server.backlog.updateIssue(issue.serialize())
         return Issue(**ret)
     
     def switch_status(self, status):
-        if not isinstance(status, UpdateStatus) :
-            status = UpdateStatus(**status)
+        status = classwrap(status,UpdateStatus)
         ret = self.server.backlog.switchStatus(status.serialize())
         return Issue(**ret)
     
@@ -111,8 +109,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """
-        if not isinstance(issueType, AddIssueType) :
-            issueType = AddIssueType(**issueType)
+        issueType = classwrap(issueType,AddIssueType)
         ret = self.server.backlog.addIssueType(issueType.serialize())
         return IssueType(**ret)
     
@@ -120,8 +117,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """        
-        if not isinstance(issueType, IssueType) :
-            issueType = IssueType(**issueType)
+        issueType = classwrap(issueType,IssueType)            
         ret = self.server.backlog.updateIssueType(issueType.serialize())
         return IssueType(**ret)
     
@@ -139,8 +135,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """
-        if not isinstance(version,AddVersion) :
-            version = AddVersion(**version)
+        version = classwrap(version,AddVersion)            
         ret = self.server.backlog.addVersion(version.serialize())
         return UpdateVersion(**ret)
     
@@ -148,8 +143,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """
-        if not isinstance(version, UpdateVersion) :
-            version = UpdateVersion(**version)
+        version = classwrap(version,UpdateVersion)            
         ret = self.server.backlog.updateVersion(version.serialize())
         return UpdateVersion(**ret)
     
@@ -164,8 +158,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """        
-        if not isinstance(component, AddComponent) :
-            component = AddComponent(**component)        
+        component = classwrap(component,AddComponent)            
         ret = self.server.backlog.addComponent(component.serialize())
         return Component(**ret)
     
@@ -173,8 +166,7 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31)
         """ 
-        if not isinstance(component, Component) :
-            component = Component(**component)
+        component = classwrap(component,Component)
         ret = self.server.backlog.updateComponent(component.serialize())
         return Component(**ret)
     
@@ -199,9 +191,11 @@ class Backlog(BacklogBase):
         ret = self.server.backlog.getActivityTypes();
         return [ActivityType(**x) for x in ret]
     
-    def add_comment(self):
+    def add_comment(self,comment):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        
+        TODO
         """        
         pass
     
@@ -209,13 +203,15 @@ class Backlog(BacklogBase):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
-        pass    
+        ret = self.server.backlog.getProjectSummary(project_id)
+        return DetailProjectSummary(**ret)
             
     def get_project_summaries(self):
         """
         @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
         """        
-        pass
+        ret = self.server.backlog.getProjectSummaries()
+        return [ProjectSummary(**x) for x in ret]
     
     def get_user(self,user_id):
         """
@@ -268,8 +264,7 @@ class BacklogAdmin(BacklogBase):
         return [AdminUser(**x) for x in users]
         
     def add_user(self, user):
-        if not isinstance(user, AdminAddUser) :
-            user = AdminAddUser(**user)
+        user = classwrap(user,AdminAddUser)
         ret = self.server.backlog.admin.addUser(user.serialize())
         return AdminUser(**ret)
     
@@ -294,8 +289,7 @@ class BacklogAdmin(BacklogBase):
         return [AdminProject(**x) for x in projects]
     
     def add_project(self, project):
-        if not isinstance(project,AdminAddProject) :
-            project = AdminAddProject(**project)
+        project = classwrap(project,AdminAddProject)
         ret = self.server.backlog.admin.addProject(project.serialize())
         return AdminProject(**ret)
     
@@ -320,19 +314,16 @@ class BacklogAdmin(BacklogBase):
         return [AdminProjectUser(**x) for x in ret]
     
     def add_project_user(self,project_user):
-        if not isinstance(project_user, AdminAddProjectUser) :
-            project_user = AdminAddProjectUser(**project_user)
+        project_user = classwrap(project_user,AdminAddProjectUser)
         ret = self.server.backlog.admin.addProjectUser(project_user.serialize())
         return AdminProjectUser(**ret)
     
     def update_project_users(self, project_users):
-        if not isinstance(project_users,AdminUpdateProjectUsers) :
-            project_users = AdminUpdateProjectUsers(**project_users)
+        project_users = classwrap(project_users,AdminUpdateProjectUsers)
         ret = self.server.backlog.admin.updateProjectUsers(project_users.serialize())
         return [AdminProjectUser(**x) for x in ret]
     
     def delete_project_user(self,project_user):
-        if not isinstance(project_user, AdminAddProjectUser) :
-            project_user = AdminAddProjectUser(**project_user)
+        project_user = classwrap(project_user,AdminAddProjectUser)
         ret = self.server.backlog.admin.deleteProjectUser(project_user.serialize())
         return AdminProjectUser(**ret)

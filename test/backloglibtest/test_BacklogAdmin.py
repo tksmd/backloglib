@@ -31,7 +31,6 @@ class BacklogAdminTest(BacklogAdminTestCase):
     def test_manage_user1(self):
         passwd = md5.new()
         passwd.update("password")
-#        self.backlog.delete_user(1073742970)
         actual = self.backlog.add_user({"user_id":u"uid",
                                         "password_md5":passwd.hexdigest(),
                                         "name":"name",

@@ -23,6 +23,8 @@
 """
 import types
 
+from utils import classwrap
+
 class Serializable(object):
     """
     XML-RPC 用に marshall するためのメソッドを持つクラス
@@ -50,13 +52,7 @@ class BacklogObject(Serializable):
     
     def __repr__(self):        
         return self.__class__._REPR_FORMAT_ % vars(self)
-    
-    def _wrap(self, obj, clazz):
-        ret = obj
-        if not isinstance(obj, clazz) :
-            ret = clazz(**obj)
-        return ret
-        
+            
     __str__ = __repr__
 
 Component = type("Component", (BacklogObject,), {})
@@ -258,17 +254,56 @@ class TimelineIssue(BacklogObject):
         self.key = key
         self.summary = summary
         self.description = description
-        self.priority = self._wrap(priority,Priority)
+        self.priority = classwrap(priority,Priority)
 
 class Timeline(BacklogObject):
     
     _REPR_FORMAT_ = "[%(updated_on)s] %(content)s"    
     
     def __init__(self,type,content,updated_on,user,issue):
-        self.type = self._wrap(type, ActivityType)
+        self.type = classwrap(type, ActivityType)
         self.content = content
         self.updated_on = updated_on
-        self.issue = self._wrap(issue, TimelineIssue)
+        self.issue = classwrap(issue, TimelineIssue)
+
+class StatusSummary(Status):
+    
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(count)s"    
+    
+    def __init__(self,id,name,count):
+        super(StatusSummary,self).__init__(id,name)
+        self.count = count
+
+class MilestoneSummary(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(due_date)s %(statuses)s"    
+    
+    def __init__(self,id,name,due_date,statuses=None,burndown_chart=None):
+        self.id = id
+        self.name = name
+        self.due_date = due_date
+        self.statuses = [classwrap(x, StatusSummary) for x in statuses] if statuses else None
+        self.burndown_chart = burndown_chart
+
+class ProjectSummary(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(key)s %(url)s %(statuses)s %(current_milestone)s"
+        
+    def __init__(self,id,name,key,url,statuses,current_milestone=None):
+        self.id = id
+        self.name = name
+        self.key = key
+        self.url = url
+        self.statuses = [classwrap(x, StatusSummary) for x in statuses] if statuses else None
+        self.current_milestone = classwrap(current_milestone, MilestoneSummary)
+
+class DetailProjectSummary(ProjectSummary):
+    
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(key)s %(url)s %(statuses)s %(milestones)s %(current_milestone)s"    
+    
+    def __init__(self,id,name,key,url,statuses,milestones,current_milestone=None):
+        super(DetailProjectSummary,self).__init__(id,name,key,url,statuses,current_milestone)
+        self.milestones = [classwrap(x, MilestoneSummary) for x in milestones]
 
 ###
 ### 以下 BacklogAdmin 用のモデルオブジェクト
