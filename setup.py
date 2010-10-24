@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2009 Takashi SOMEDA
+# Copyright 2009 - 2010 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@
 from distutils.core import setup
 import sys
 
-if not (2, 4) < sys.version_info[:2] :
-    raise Exception("backloglib requires a Python 2 version newer than 2.4. \n now running on %s" % sys.version)
+if not (2, 5) < sys.version_info[:2] :
+    raise Exception("backloglib requires a Python 2 version newer than 2.5. \n now running on %s" % sys.version)
 
 setup(
       name = "backloglib",
-      version = "0.1.1",
+      version = "0.2.1",
       author = "Takashi Someda",
       author_email = "someda@isenshi.com",
       url = "http://code.google.com/p/backloglib/",
-      download_url = "http://backloglib.googlecode.com/files/backloglib-0.1.1.tar.gz",
+      download_url = "http://backloglib.googlecode.com/files/backloglib-0.2.1.tar.gz",
       description = "Backlog client library",
       long_description ="",
       platforms = "any",      

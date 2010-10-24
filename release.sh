@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2009 Takashi SOMEDA
+# Copyright 2009 - 2010 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
