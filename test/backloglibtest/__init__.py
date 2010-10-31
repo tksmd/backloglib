@@ -19,12 +19,20 @@ import unittest
 
 import backloglib
 
-class BacklogTestCase(unittest.TestCase):
+class BacklogTestBase(unittest.TestCase):
     
     def setUp(self):
-        self.backlog = backloglib.Backlog("space","user","password")         
+        self.backlog = self._createBacklog()
+    
+    def _createBacklog(self):
+        pass
+
+class BacklogTestCase(BacklogTestBase):
+            
+    def _createBacklog(self):
+        return backloglib.Backlog("space","user","password")        
         
-class BacklogAdminTestCase(unittest.TestCase):
+class BacklogAdminTestCase(BacklogTestBase):
     
-    def setUp(self):
-        self.backlog = backloglib.Backlog("space","admin","password")        
+    def _createBacklog(self):
+        return backloglib.BacklogAdmin("space","admin","password")    
