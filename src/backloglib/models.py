@@ -288,23 +288,16 @@ class MilestoneSummary(BacklogObject):
 
 class ProjectSummary(BacklogObject):
     
-    _REPR_FORMAT_ = "[%(id)s] %(name)s %(key)s %(url)s %(statuses)s %(current_milestone)s"
+    _REPR_FORMAT_ = "[%(id)s] %(name)s %(key)s %(url)s %(statuses)s %(milestones)s %(current_milestone)s"
         
-    def __init__(self,id,name,key,url,statuses,current_milestone=None):
+    def __init__(self,id,name,key,url,statuses,milestones,current_milestone=None):
         self.id = id
         self.name = name
         self.key = key
         self.url = url
         self.statuses = [classwrap(x, StatusSummary) for x in statuses] if statuses else None
+        self.milestones = [classwrap(x, MilestoneSummary) for x in milestones] if milestones else None        
         self.current_milestone = classwrap(current_milestone, MilestoneSummary)
-
-class DetailProjectSummary(ProjectSummary):
-    
-    _REPR_FORMAT_ = "[%(id)s] %(name)s %(key)s %(url)s %(statuses)s %(milestones)s %(current_milestone)s"    
-    
-    def __init__(self,id,name,key,url,statuses,milestones,current_milestone=None):
-        super(DetailProjectSummary,self).__init__(id,name,key,url,statuses,current_milestone)
-        self.milestones = [classwrap(x, MilestoneSummary) for x in milestones]
 
 class AddComment(BacklogObject):
     

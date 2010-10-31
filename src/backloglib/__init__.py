@@ -32,7 +32,6 @@ __all__ = ["Backlog","BacklogAdmin"]
 # Backlog (http://www.backlog.jp) CLIENT LIBRARY
 #
 from xmlrpclib import ServerProxy
-import types
 
 from utils import classwrap
 from models import *
@@ -206,7 +205,7 @@ class Backlog(BacklogBase):
         @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getProjectSummary(project_id)
-        return DetailProjectSummary(**ret)
+        return ProjectSummary(**ret)
             
     def get_project_summaries(self):
         """
