@@ -157,7 +157,7 @@ class BacklogTest(backloglibtest.BacklogTestCase):
         self.assertEquals("image/gif",actual.content_type)        
         self.assertTrue(isinstance(actual.data,xmlrpclib.Binary))        
         
-        [fd,tmppath] = tempfile.mkstemp()        
+        [fd,tmppath] = tempfile.mkstemp()        #@UnusedVariable
         print tmppath
         buf = actual.data.data
         s = len(buf)

@@ -306,6 +306,14 @@ class DetailProjectSummary(ProjectSummary):
         super(DetailProjectSummary,self).__init__(id,name,key,url,statuses,current_milestone)
         self.milestones = [classwrap(x, MilestoneSummary) for x in milestones]
 
+class AddComment(BacklogObject):
+    
+    _REPR_FORMAT_ = "[%(key)s] %(content)s"
+    
+    def __init__(self,key,content):
+        self.key = key
+        self.content = content
+
 ###
 ### 以下 BacklogAdmin 用のモデルオブジェクト
 ###
@@ -344,7 +352,7 @@ class AdminUpdateUser(AdminAddUser):
 class AdminProject(Project):
     
     def __init__(self,id,name,key,url,use_chart=False,archived=False,created_on=None,updated_on=None):
-        super(AdminProject,self).__init__(id,name,key,url,archived)
+        super(AdminProject,self).__init__(id,key,name,url,archived)
         self.use_chart = use_chart
         self.created_on = created_on
         self.updated_on = updated_on
@@ -361,7 +369,7 @@ class AdminAddProject(BacklogObject):
 class AdminUpdateProject(AdminProject):
     
     def __init__(self,id,name=None,key=None,use_chart=False,archived=False):
-        super(AdminUpdateProject,self).__init__(id,name,key,use_chart,archived)
+        super(AdminUpdateProject,self).__init__(id,name,key,None,use_chart,archived)
         
 class AdminProjectUser(BacklogObject):
     

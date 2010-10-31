@@ -26,6 +26,8 @@ XML-RPC で提供されている API に対してアクセスを行い、オブ�
 __version__ = "0.2.1"
 __author__ = "someda@isenshi.com"
 
+__all__ = ["Backlog","BacklogAdmin"]
+
 #
 # Backlog (http://www.backlog.jp) CLIENT LIBRARY
 #
@@ -179,71 +181,71 @@ class Backlog(BacklogBase):
     
     def get_timeline(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getTimeline()
         return [Timeline(**x) for x in ret]
     
     def get_activity_types(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getActivityTypes();
         return [ActivityType(**x) for x in ret]
     
     def add_comment(self,comment):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
-        
-        TODO
-        """        
-        pass
+        @since: 0.2.1 (Backlog R2010-10-28)        
+        """
+        comment = classwrap(comment, AddComment)
+        ret = self.server.backlog.addComment(comment.serialize())
+        return Comment(**ret)
     
     def get_project_summary(self, project_id):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getProjectSummary(project_id)
         return DetailProjectSummary(**ret)
             
     def get_project_summaries(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getProjectSummaries()
         return [ProjectSummary(**x) for x in ret]
     
     def get_user(self,user_id):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getUser(user_id)
         return DetailUser(**ret)
     
     def get_user_icon(self,user_id):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         ret = self.server.backlog.getUserIcon(user_id)
         return UserIcon(**ret)
     
     def get_statuses(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """
         statuses = self.server.backlog.getStatuses()
         return [Status(**x) for x in statuses]              
     
     def get_resolutions(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """        
         resolutions = self.server.backlog.getResolutions()
         return [Resolution(**x) for x in resolutions]
     
     def get_priorities(self):
         """
-        @since: 0.2.1 (Backlog R2010-03-31 not-opened)        
+        @since: 0.2.1 (Backlog R2010-10-28)        
         """
         priorities = self.server.backlog.getPriorities()
         return [Priority(**x) for x in priorities]        
@@ -299,7 +301,7 @@ class BacklogAdmin(BacklogBase):
             del project["created_on"]
             del project["updated_on"]
             del project["url"]
-            project = AdminAddProject(**project)        
+            project = AdminUpdateProject(**project)        
         elif not isinstance(project,AdminUpdateProject) :
             project = AdminUpdateProject(**project)
         ret = self.server.backlog.admin.updateProject(project.serialize())
@@ -316,7 +318,7 @@ class BacklogAdmin(BacklogBase):
     def add_project_user(self,project_user):
         project_user = classwrap(project_user,AdminAddProjectUser)
         ret = self.server.backlog.admin.addProjectUser(project_user.serialize())
-        return AdminProjectUser(**ret)
+        return [AdminProjectUser(**x) for x in ret]
     
     def update_project_users(self, project_users):
         project_users = classwrap(project_users,AdminUpdateProjectUsers)
@@ -326,4 +328,4 @@ class BacklogAdmin(BacklogBase):
     def delete_project_user(self,project_user):
         project_user = classwrap(project_user,AdminAddProjectUser)
         ret = self.server.backlog.admin.deleteProjectUser(project_user.serialize())
-        return AdminProjectUser(**ret)
+        return [AdminProjectUser(**x) for x in ret]
