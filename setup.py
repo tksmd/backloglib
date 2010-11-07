@@ -18,7 +18,7 @@
 from distutils.core import setup
 import sys
 
-if not (2, 5) < sys.version_info[:2] :
+if not (2, 5) <= sys.version_info[:2] :
     raise Exception("backloglib requires a Python 2 version newer than 2.5. \n now running on %s" % sys.version)
 
 setup(
