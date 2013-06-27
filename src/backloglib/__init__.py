@@ -23,7 +23,7 @@ XML-RPC で提供されている API に対してアクセスを行い、オブ�
 返す機能を提供します。
 """
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __author__ = "someda@isenshi.com"
 
 __all__ = ["Backlog","BacklogAdmin"]

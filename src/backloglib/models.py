@@ -51,8 +51,8 @@ class BacklogObject(Serializable):
         self.name = name
     
     def __repr__(self):        
-        return self.__class__._REPR_FORMAT_ % vars(self)
-            
+        return (self.__class__._REPR_FORMAT_ % vars(self)).encode('utf-8')
+
     __str__ = __repr__
 
 Component = type("Component", (BacklogObject,), {})
@@ -74,12 +74,14 @@ class Project(BacklogObject):
     
     _REPR_FORMAT_ = "[%(id)s][%(key)s] %(url)s"
     
-    def __init__(self, id, key, name, url, archived):
+    def __init__(self, id, key, name, url, archived, text_formatting_rule=None,use_parent_child_issue=False):
         self.id = id
         self.key = key
         self.name = name
         self.url = url
         self.archived = archived
+        self.text_formatting_rule = text_formatting_rule
+        self.use_parent_child_issue = use_parent_child_issue
                     
 class Version(BacklogObject):
     
@@ -344,8 +346,8 @@ class AdminUpdateUser(AdminAddUser):
         
 class AdminProject(Project):
     
-    def __init__(self,id,name,key,url,use_chart=False,archived=False,created_on=None,updated_on=None):
-        super(AdminProject,self).__init__(id,key,name,url,archived)
+    def __init__(self,id,name,key,url,use_chart=False,archived=False,created_on=None,updated_on=None,text_formatting_rule=None,use_parent_child_issue=False):
+        super(AdminProject,self).__init__(id,key,name,url,archived,text_formatting_rule,use_parent_child_issue)
         self.use_chart = use_chart
         self.created_on = created_on
         self.updated_on = updated_on
