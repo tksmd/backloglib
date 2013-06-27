@@ -23,11 +23,11 @@ if not (2, 5) <= sys.version_info[:2] :
 
 setup(
       name = "backloglib",
-      version = "0.2.1",
+      version = "0.2.2",
       author = "Takashi Someda",
       author_email = "someda@isenshi.com",
       url = "http://code.google.com/p/backloglib/",
-      download_url = "http://backloglib.googlecode.com/files/backloglib-0.2.1.tar.gz",
+      download_url = "http://backloglib.googlecode.com/files/backloglib-0.2.2.tar.gz",
       description = "Backlog client library",
       long_description ="",
       platforms = "any",      
