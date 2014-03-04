@@ -36,12 +36,12 @@ from xmlrpclib import ServerProxy
 from utils import classwrap
 from models import *
 
-_URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.backlog.jp/XML-RPC"
+_URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.%(domain)s/XML-RPC"
 
 
 class BacklogBase(object):
-    def __init__(self, space, username, password):
-        uri = _URI_FORMAT_ % {"username": username, "password": password, "space": space}
+    def __init__(self, space, username, password, domain="backlog.jp"):
+        uri = _URI_FORMAT_ % {"username": username, "password": password, "space": space, "domain": domain}
         self.server = ServerProxy(uri)
 
 
