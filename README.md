@@ -12,6 +12,8 @@ backloglib is a simple [Backlog](http://backlogtool.com) API wrapper for python.
 * 2014/03/05 0.2.3 released ( moved from https://code.google.com/p/backloglib/ )
 * 2010/11/06 0.2.1 released
 
+For more details, refer to [[ReleaseNotes]].
+
 ## Install
 
 ```
@@ -25,9 +27,7 @@ Basically you should follow the steps below
 1. Initialize Backlog object with your space, username and password
 2. call API method with the Backlog object
 
-API method info is provided in [here](http://www.backlog.jp/api).
-
-Here is an example how to call Backlog API with backloglib. Method names in Backlog API are converted from camel case to snake case in backloglib.
+Information about API method is provided [here](http://www.backlog.jp/api). Here's an example how to call Backlog API with backloglib. Method names in Backlog API are converted from camel case to snake case in backloglib.
 
 ```python
 import backloglib
@@ -75,13 +75,13 @@ issues = backlog.find_issue({
 # create an issue
 issue = backlog.create_issue({
                              "projectId":project.id,
-                             "summary":u"課題のサマリ"
+                             "summary":u"Issue summary"
                              })
 
 # update an issue
 updated = backlog.update_issue({
                                "key":issue.key,
-                               "summary":u"サマリの更新"
+                               "summary":u"Update issue summary"
                                })
 
 # update issue status
@@ -129,7 +129,7 @@ backloglib は [Backlog](http://www.backlog.jp) の API にアクセスするた
 * 2014/03/05 0.2.3 をリリースしました ( https://code.google.com/p/backloglib/ から移転しました )
 * 2010/11/06 0.2.1 をリリースしました
 
-リリースの詳細については ReleaseNotes を参照ください。
+リリースの詳細については [[ReleaseNotes]] を参照ください。
 
 ## 利点
 
@@ -166,10 +166,10 @@ $ python setup.py install
 
 [easy_install](http://peak.telecommunity.com/DevCenter/EasyInstall) を利用する場合は、まずお手元の環境に [setuptools](http://pypi.python.org/pypi/setuptools) をインストールした後に以下を実行してください。
 
- # easy_install を実行
-{{{
+```
+# easy_install を実行
 $ easy_install backloglib
-}}}
+```
 
 ## 使い方
 
