@@ -12,7 +12,7 @@ backloglib is a simple [Backlog](http://backlogtool.com) API wrapper for python.
 * 2014/03/05 0.2.3 released ( moved from https://code.google.com/p/backloglib/ )
 * 2010/11/06 0.2.1 released
 
-For more details, refer to [[ReleaseNotes]].
+For more details, refer to [Release Notes](https://github.com/tksmd/backloglib/wiki/ReleaseNotes).
 
 ## Install
 
@@ -129,7 +129,7 @@ backloglib は [Backlog](http://www.backlog.jp) の API にアクセスするた
 * 2014/03/05 0.2.3 をリリースしました ( https://code.google.com/p/backloglib/ から移転しました )
 * 2010/11/06 0.2.1 をリリースしました
 
-リリースの詳細については [[ReleaseNotes]] を参照ください。
+リリースの詳細については [リリースノート](https://github.com/tksmd/backloglib/wiki/ReleaseNotes) を参照ください。
 
 ## 利点
 
