@@ -34,7 +34,10 @@ import backloglib
 
 # ----- 1. initialize backlog object -----
 
+# for backlog.jp users
 backlog = backloglib.Backlog("spacename","username","password")
+# for backlogtool.com users
+backlog = backloglib.Backlog("spacename","username","password", domain="backlogtool.com")
 
 # ----- 2. API call -----
 
