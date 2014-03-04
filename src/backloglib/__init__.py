@@ -23,7 +23,7 @@ XML-RPC で提供されている API に対してアクセスを行い、オブ�
 返す機能を提供します。
 """
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __author__ = "someda@isenshi.com"
 
 __all__ = ["Backlog", "BacklogAdmin"]
@@ -99,7 +99,7 @@ class Backlog(BacklogBase):
         return Issue(**ret)
 
     def update_issue(self, issue):
-        issue = classwrap(issue)
+        issue = classwrap(issue, Issue)
         ret = self.server.backlog.updateIssue(issue.serialize())
         return Issue(**ret)
 
