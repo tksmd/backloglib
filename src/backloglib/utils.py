@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2009 - 2010 Takashi SOMEDA
+# Copyright 2009 - 2014 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-def classwrap(obj,clazz):
+def classwrap(obj, clazz):
     """
     dict 型のオブジェクトを clazz にラップして返す
     """
     ret = obj
-    if ret and not isinstance(ret,clazz) :
+    if ret and not isinstance(ret, clazz):
         ret = clazz(**ret)
     return ret

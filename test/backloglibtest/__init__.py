@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2009 - 2010 Takashi SOMEDA
+# Copyright 2009 - 2014 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,20 +19,20 @@ import unittest
 
 import backloglib
 
+
 class BacklogTestBase(unittest.TestCase):
-    
     def setUp(self):
         self.backlog = self._createBacklog()
-    
+
     def _createBacklog(self):
         pass
 
+
 class BacklogTestCase(BacklogTestBase):
-            
     def _createBacklog(self):
-        return backloglib.Backlog("space","user","password")        
-        
+        return backloglib.Backlog("space", "user", "password")
+
+
 class BacklogAdminTestCase(BacklogTestBase):
-    
     def _createBacklog(self):
-        return backloglib.BacklogAdmin("space","admin","password")    
+        return backloglib.BacklogAdmin("space", "admin", "password")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2009 - 2010 Takashi SOMEDA
+# Copyright 2009 - 2014 Takashi SOMEDA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,30 +15,32 @@
 # either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-from test import test_support
+import unittest
 
 from backloglib import utils
 from backloglib.models import Status
 
-import unittest
+from test import test_support
+
 
 class UtilsTest(unittest.TestCase):
-    
     def test_classwrap1(self):
         actual = utils.classwrap(None, Status)
         self.assertTrue(not actual)
-        
+
     def test_classwrap2(self):
-        actual = utils.classwrap({"id":1,"name":"hoge"}, Status)
-        self.assertTrue(isinstance(actual,Status))
-                
+        actual = utils.classwrap({"id": 1, "name": "hoge"}, Status)
+        self.assertTrue(isinstance(actual, Status))
+
     def test_classwrap3(self):
-        status = Status(1,"hoge")
+        status = Status(1, "hoge")
         actual = utils.classwrap(status, Status)
-        self.assertTrue(isinstance(actual,Status))                
+        self.assertTrue(isinstance(actual, Status))
+
 
 def test_main():
     test_support.run_unittest(UtilsTest)
-        
-if __name__ == '__main__' :
+
+
+if __name__ == '__main__':
     test_main()
