@@ -2,7 +2,7 @@
 
 (英語の下に日本文が記載されています)
 
-backloglib is a simple [Backlog](http://backlogtool.com) API wrapper for python. backloglib offers simple types for each API call (like Issue or Project). backloglib helps you to use Backlog API in that
+backloglib is a simple [Backlog](http://backlogtool.com) API wrapper for python and offers types for return value of each API call (like Issue or Project). This helps you to use Backlog API in that
 
 * it enables method completion by IDE like Pydev or PyCharm
 * it secures your code with type validation before calling API
