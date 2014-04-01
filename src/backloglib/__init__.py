@@ -23,7 +23,7 @@ XML-RPC で提供されている API に対してアクセスを行い、オブ�
 返す機能を提供します。
 """
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 __author__ = "someda@isenshi.com"
 
 __all__ = ["Backlog", "BacklogAdmin"]
@@ -31,7 +31,7 @@ __all__ = ["Backlog", "BacklogAdmin"]
 #
 # Backlog (http://www.backlog.jp) CLIENT LIBRARY
 #
-from xmlrpclib import ServerProxy
+from xmlrpclib import ServerProxy, Transport
 
 from utils import classwrap
 from models import *
@@ -42,6 +42,7 @@ _URI_FORMAT_ = "https://%(username)s:%(password)s@%(space)s.%(domain)s/XML-RPC"
 class BacklogBase(object):
     def __init__(self, space, username, password, domain="backlog.jp"):
         uri = _URI_FORMAT_ % {"username": username, "password": password, "space": space, "domain": domain}
+        Transport.user_agent = 'backloglib/%s' % __version__
         self.server = ServerProxy(uri)
 
 
@@ -94,12 +95,12 @@ class Backlog(BacklogBase):
         return [Issue(**x) for x in issues]
 
     def create_issue(self, issue):
-        issue = classwrap(issue, Issue)
+        issue = classwrap(issue, AddIssue)
         ret = self.server.backlog.createIssue(issue.serialize())
         return Issue(**ret)
 
     def update_issue(self, issue):
-        issue = classwrap(issue, Issue)
+        issue = classwrap(issue, UpdateIssue)
         ret = self.server.backlog.updateIssue(issue.serialize())
         return Issue(**ret)
 

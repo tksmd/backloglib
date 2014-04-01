@@ -36,7 +36,7 @@ class Serializable(object):
 
     def _do_convert(self, obj):
         if isinstance(obj, types.DictType):
-            return dict([(k, self._do_convert(v)) for k, v in obj.iteritems() if v])
+            return dict([(k, self._do_convert(v)) for k, v in obj.iteritems() if v is not None])
         elif isinstance(obj, types.ListType) or isinstance(obj, types.TupleType):
             return [self._do_convert(v) for v in obj]
         elif hasattr(obj, "__dict__"):
@@ -71,8 +71,23 @@ class AddComponent(BacklogObject):
 
 User = type("User", (BacklogObject,), {})
 Priority = type("Priority", (BacklogObject,), {"HIGH": 2, "MIDDLE": 3, "LOW": 4})
-Resolution = type("Resolution", (BacklogObject,),
-                  {"UNSET": -1, "DONE": 0, "IGNORE": 1, "INVALID": 2, "DUPLICATE": 3, "WORKWELL": 4})
+
+
+class Resolution(BacklogObject):
+    _REPR_FORMAT_ = "[%(id)s] %(name)s"
+
+    UNSET = -1
+    DONE = 0
+    IGNORE = 1
+    INVALID = 2
+    DUPLICATE = 3
+    WORKWELL = 4
+
+    @classmethod
+    def availables(cls):
+        return [cls.DONE, cls.IGNORE, cls.INVALID, cls.DUPLICATE, cls.WORKWELL]
+
+
 Status = type("Status", (BacklogObject,), {"UNDONE": 1, "PROGRESS": 2, "COMPLETED": 3, "DONE": 4})
 
 
@@ -317,6 +332,73 @@ class AddComment(BacklogObject):
         self.content = content
 
 
+class BaseIssue(BacklogObject):
+    def __init__(self,
+                 summary=None, description=None, start_date=None, due_date=None,
+                 estimated_hours=None, actual_hours=None, issueType=None, issueTypeId=None,
+                 component=None, componentId=None, version=None, versionId=None,
+                 milestone=None, milestoneId=None, priority=None, priorityId=None, assignerId=None):
+        self.summary = summary
+        self.description = description
+        self.start_date = start_date
+        self.due_date = due_date
+        self.estimated_hours = estimated_hours
+        self.actual_hours = actual_hours
+        self.set_int_or_str('issueType', 'issueTypeId', issueType, issueTypeId)
+        self.set_int_or_str('component', 'componentId', component, componentId)
+        self.set_int_or_str('version', 'versionId', version, versionId)
+        self.set_int_or_str('milestone', 'milestoneId', milestone, milestoneId)
+        self.set_int_or_str('priority', 'priorityId', priority, priorityId)
+        self.assinerId = assignerId
+
+
+    def set_int_or_str(self, str_name, int_name, str_val, int_val):
+        if str_val and int_val:
+            raise Exception('both %s or %s are given, you have to choose either one' % (str_name, int_name,))
+
+        if str_val:
+            setattr(self, str_name, str_val)
+
+        if int_val:
+            setattr(self, int_name, int(int_val))
+
+
+class AddIssue(BaseIssue):
+    _REPR_FORMAT_ = "[%(projectId)s] %(summary)s"
+
+    def __init__(self,
+                 projectId, summary, description=None, start_date=None, due_date=None,
+                 estimated_hours=None, actual_hours=None, issueType=None, issueTypeId=None,
+                 component=None, componentId=None, version=None, versionId=None,
+                 milestone=None, milestoneId=None, priority=None, priorityId=None, assignerId=None):
+        super(AddIssue, self).__init__(summary, description=description, start_date=start_date, due_date=due_date,
+                                       estimated_hours=estimated_hours, actual_hours=actual_hours,
+                                       issueType=issueType, issueTypeId=issueTypeId, component=component, componentId=componentId,
+                                       version=version, versionId=versionId, milestone=milestone, milestoneId=milestoneId,
+                                       priority=priority, priorityId=priorityId, assignerId=assignerId)
+        self.projectId = projectId
+
+
+class UpdateIssue(BaseIssue):
+    _REPR_FORMAT_ = "[%(key)s] %(summary)s"
+
+    def __init__(self,
+                 key, summary=None, description=None, start_date=None, due_date=None,
+                 estimated_hours=None, actual_hours=None, issueType=None, issueTypeId=None,
+                 component=None, componentId=None, version=None, versionId=None,
+                 milestone=None, milestoneId=None, priority=None, priorityId=None, assignerId=None,
+                 resolutionId=None, comment=None):
+        super(UpdateIssue, self).__init__(summary, description=description, start_date=start_date, due_date=due_date,
+                                       estimated_hours=estimated_hours, actual_hours=actual_hours,
+                                       issueType=issueType, issueTypeId=issueTypeId, component=component, componentId=componentId,
+                                       version=version, versionId=versionId, milestone=milestone, milestoneId=milestoneId,
+                                       priority=priority, priorityId=priorityId, assignerId=assignerId)
+        self.key = key
+        if resolutionId is None or resolutionId in Resolution.availables():
+            self.resolutionId = resolutionId
+        self.comment = comment
+
+
 ###
 ### 以下 BacklogAdmin 用のモデルオブジェクト
 ###
@@ -399,4 +481,3 @@ class AdminUpdateProjectUsers(BacklogObject):
         self.project_id = project_id
         # 以下の user_id は配列
         self.user_id = user_id    
-    

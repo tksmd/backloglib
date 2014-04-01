@@ -19,13 +19,14 @@ import unittest
 import xmlrpclib
 import tempfile
 import os
+from test import test_support
 
 import backloglib
 
 import backloglibtest
-from test import test_support
 
-_AVAILABLE_PROJECT_ID_ = 12016
+
+_AVAILABLE_PROJECT_ID_ = 1258
 
 
 class BacklogTest(backloglibtest.BacklogTestCase):
@@ -35,7 +36,7 @@ class BacklogTest(backloglibtest.BacklogTestCase):
         self.assertEquals(1, len(projects))
 
     def test_get_project1(self):
-        project = self.backlog.get_project("ZAKU")
+        project = self.backlog.get_project("SOMEDATEST")
         print project
 
     def test_get_project2(self):
@@ -64,6 +65,7 @@ class BacklogTest(backloglibtest.BacklogTestCase):
     def test_get_issue1(self):
         issue = self.backlog.get_issue("ZAKU-1")
         print issue
+        print issue.priority
 
     def test_get_issue2(self):
         issue = self.backlog.get_issue(472153)
@@ -196,6 +198,31 @@ class BacklogTest(backloglibtest.BacklogTestCase):
         """
         actual = self.backlog.get_resolutions()
         self.assertEquals(5, len(actual))
+
+#    def test_update_issue1(self):
+#        issue = self.backlog.get_issue("ZAKU-6")
+#        issue.summary = 'cccc'
+#        self.backlog.update_issue(issue)
+
+    def test_get_components2(self):
+        ret = self.backlog.get_components({'projectId': _AVAILABLE_PROJECT_ID_})
+        print ret
+
+    def test_create_issue1(self):
+        issue = self.backlog.create_issue({
+            "projectId": _AVAILABLE_PROJECT_ID_,
+            "summary": u"テスト",
+            "priorityId": backloglib.models.Priority.HIGH,
+            "component": "test",
+            "estimated_hours": 1.5
+        })
+
+    def test_update_issue1(self):
+        issue = self.backlog.update_issue({
+            "key": "SOMEDATEST-11",
+            "priorityId": backloglib.models.Priority.HIGH,
+            "resolutionId": backloglib.models.Resolution.DONE,
+        })
 
 
 class FindConditionTest(unittest.TestCase):
